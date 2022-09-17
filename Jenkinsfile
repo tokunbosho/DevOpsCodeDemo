@@ -14,13 +14,18 @@ pipeline{
               }
           }
           stage('Compile'){
-             
+		  when{
+			  branch 'Dev'
+		  }
               steps{
                   echo 'complie the code..'
                   sh 'mvn compile'
 	      }
           }
           stage('CodeReview'){
+		    when{
+			  branch 'Dev'
+		  }
 		  
               steps{
 		    
@@ -29,6 +34,9 @@ pipeline{
               }
           }
            stage('UnitTest'){
+		     when{
+			  branch 'test'
+		  }
 		  
               steps{
 	         
@@ -37,6 +45,10 @@ pipeline{
           
           }
            stage('MetricCheck'){
+		   
+		     when{
+			  branch 'test'
+		  }
               
               steps{
                   sh 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
@@ -46,12 +58,27 @@ pipeline{
           }
           stage('Package'){
 		  
+		    when{
+			  branch 'Deploy'
+		  }
+		  
               steps{
 		  
                   sh 'mvn package'
               }
           }
 	     
+	                stage('Deploy'){
+		  
+		    when{
+			  branch 'Deploy'
+		  }
+		  
+              steps{
+		  
+                  sh 'echo "deploy code"'
+              }
+          }
           
       }
 }
