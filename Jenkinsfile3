@@ -1,0 +1,36 @@
+pipeline {
+    tools {
+        jdk "myjava"
+        maven "mymaven"
+    }
+    agent {label 'jenkins_slave'}
+        stages{
+            stage("Checkout"){
+                steps {
+                echo 'cloning..'
+                git 'https://github.com/tokunbosho/DevOpsCodeDemo.git'
+            }
+        }
+            stage('Compile the code'){
+            steps{
+                echo 'compile the code..'
+                sh 'mvn compile'
+            }
+        }
+            stage('Code Review'){
+                steps{
+                sh 'mvn pmd:pmd'
+            }
+        }
+            stage('Unit Test'){
+            steps{
+                sh 'mvn test'
+            }
+        }
+        stage('Build the artifact'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+    }
+}
