@@ -1,0 +1,46 @@
+pipeline {
+    tools {
+        jdk "myjava"
+        maven "mymaven"
+    }
+    agent none
+        stages{
+            stage("Checkout"){
+                agent any
+                steps {
+                echo 'cloning..'
+                git 'https://github.com/tokunbosho/DevOps-Projects-Codes.git'
+            }
+        }
+            stage('Compile the code'){
+                agent { label 'Agent_slave'}
+            steps{
+                echo 'compile the code..'
+                sh 'mvn compile'
+            }
+        }
+            stage('Code Review'){
+                agent { label 'Agent_slave'}
+                steps{
+                sh 'mvn pmd:pmd'
+            }
+        }
+            stage('Unit Test'){
+                agent { label 'Agent_slave'}
+                steps{
+                sh 'mvn test'
+            }
+                post {
+                    success {
+                        junit 'target/surefire-reports/*.xml'
+                    }
+                }
+        }
+        stage('Build the artifact'){
+            agent any
+            steps{
+                sh 'mvn package'
+            }
+        }
+    }
+}
